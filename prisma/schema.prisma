@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Campaign {
+  id       Int        @id @default(autoincrement())
+  pool Int     @unique
+  takeout Int
+  award    Int     @unique
+}
+
+model Captured {
+  id        Int      @id @default(autoincrement())
+  pokemon   String
+  hp        Int      @default(42)
+  level     Int      @default(12)
+  xp        Int      @default(0)
+  shiny     Boolean? @default(false)
+  attacks   String[]
+  sprite    String
+  trainerId Int
+  trainer   Profile  @relation(fields: [trainerId], references: [id])
+  Trade     Trade[]
+  Offer     Offer[]
+}
+
+model Team {
+  id         Int     @id @default(autoincrement())
+  trainerId  Int
+  trainer    Profile @relation(fields: [trainerId], references: [id])
+  pokemonsId Int[]
+}
+
+model Item {
+  id        Int     @id @default(autoincrement())
+  item      String
+  sprite    String
+  amount    Int
+  trainerId Int
+  trainer   Profile @relation(fields: [trainerId], references: [id])
+}
+
+model Conquest {
+  id        Int     @id @default(autoincrement())
+  insignia  Boolean @default(false)
+  elite     Boolean @default(false)
+  frontier  Boolean @default(false)
+  title     String
+  region    String
+  trainerId Int
+  trainer   Profile @relation(fields: [trainerId], references: [id])
+}
+
+model Trade {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  trainerId Int
+  trainer   Profile  @relation(fields: [trainerId], references: [id])
+  pokemonId Int
+  pokemon   Captured @relation(fields: [pokemonId], references: [id])
+  Offer     Offer[]
+}
+
+model Offer {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  tradeId   Int
+  trade     Trade    @relation(fields: [tradeId], references: [id])
+  pokemonId Int
+  pokemon   Captured @relation(fields: [pokemonId], references: [id])
+  trainerId Int
+  trainer   Profile  @relation(fields: [trainerId], references: [id])
+}
+
+model Transfer {
+  id        Int      @id @default(autoincrement())
+  origin    Int
+  coins     Int
+  date      DateTime @default(now())
+  trainerId Int
+  trainer   Profile  @relation(fields: [trainerId], references: [id])
+}
+
+model Friend {
+  id        Int     @id @default(autoincrement())
+  friend    Int
+  profileId Int
+  profile   Profile @relation(fields: [profileId], references: [id])
+  message   Json
+}
